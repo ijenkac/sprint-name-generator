@@ -8,6 +8,7 @@ WORKDIR /build
 RUN go mod download
 RUN go build -o main github.com/flostadler/name-generator/cmd/name-generator
 FROM node:12-alpine as node-builder
+RUN apk add git
 ADD . .
 WORKDIR /web
 RUN npm install
