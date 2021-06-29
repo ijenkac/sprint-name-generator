@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  router:
+      build: ./router
+      image: sprint-name-generator-router:latest
+      volumes:
+        - ./router/conf.d:/etc/nginx/conf.d
+      ports:
+        - 80:80
+      networks:
+        frontend:
+        backend:        
+
+  green-environment:
+      build: ./
+      image: sprint-name-generator-app:latest
+      networks:
+        backend:      
+      
+  blue-environment:
+      build: ./
+      image: sprint-name-generator-app:latest
+      networks:
+        backend:            
+
+networks:  
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
