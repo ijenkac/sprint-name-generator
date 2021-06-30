@@ -9,8 +9,6 @@ services:
         interval: 10s
         timeout: 3s
         retries: 2      
-      volumes:
-        - ./router/conf.d:/etc/nginx/conf.d
       ports:
         - 80:80
       networks:
@@ -20,12 +18,14 @@ services:
   green-environment:
       build: ./
       image: sprint-name-generator-app:latest
+      hostname: green-environment
       networks:
         backend:      
       
   blue-environment:
       build: ./
       image: sprint-name-generator-app:latest
+      hostname: blue-environment
       networks:
         backend:            
 
