@@ -6,7 +6,7 @@ services:
       image: sprint-name-generator-router:latest
       healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost/"]
-        interval: 10s
+        interval: 5s
         timeout: 3s
         retries: 2      
       ports:

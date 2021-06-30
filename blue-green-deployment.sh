@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # set -x
-echo "Starting apachen benchmark to test blue/green deployment" && ab -n 30000 -c 1 http://localhost/ &
+echo "Starting apachen benchmark to test blue/green deployment" && ab -n 25000 -c 1 http://localhost/ &
 ACTIVE_ENVIRONMENT="blue-environment"
 NEW_ENVIRONMENT="green-environment"
 
@@ -24,7 +24,7 @@ else
     exit 1
 fi
 
-sleep 25
+sleep 10
 
 echo "Checking health of \"$NEW_ENVIRONMENT\" container"
 docker-compose ps | grep -p $NEW_ENVIRONMENT | grep -q "healthy"
@@ -65,7 +65,7 @@ else
     exit 1
 fi
 
-sleep 25
+sleep 10
 
 echo "Checking service after new deployment"
 docker-compose ps | grep -p router | grep -q "healthy"
