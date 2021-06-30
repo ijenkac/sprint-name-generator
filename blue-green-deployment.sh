@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # set -x
+echo "Starting apachen benchmark to test blue/green deployment" && ab -n 30000 -c 1 http://localhost/ &
 ACTIVE_ENVIRONMENT="blue-environment"
 NEW_ENVIRONMENT="green-environment"
 
@@ -78,3 +79,6 @@ else
     echo "Rollback & Exiting..."
     exit 1
 fi
+
+echo "Waiting for ab to finish test"
+wait
