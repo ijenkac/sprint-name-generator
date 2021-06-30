@@ -70,7 +70,8 @@ echo "Checking service after new deployment"
 docker-compose ps | grep -p router | grep -q "healthy"
 service_status=$?
 if [ $service_status -eq 0 ]; then
-    echo "New deployment passed check. Bye"
+    app_version=$(git rev-parse --short HEAD)
+    echo "New deployment passed check. You should see VERSION:\"$app_version\" at the bottom of the page. Bye"
 else
     echo "New deployment failed check"
     eval 'docker-compose exec -T router sed -i "s|proxy_pass http://.*;|proxy_pass http://$ACTIVE_ENVIRONMENT;|g" /etc/nginx/conf.d/router.conf'
