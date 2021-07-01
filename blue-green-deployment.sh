@@ -1,17 +1,36 @@
 #!/usr/bin/env bash
 # set -x
 echo "Starting apachen benchmark to test blue/green deployment" && ab -n 25000 -c 1 http://localhost/ &
-ACTIVE_ENVIRONMENT="blue-environment"
-NEW_ENVIRONMENT="green-environment"
+ACTIVE_ENVIRONMENT=""
+NEW_ENVIRONMENT=""
 
 if docker-compose exec -T router grep -q 'green-environment;' /etc/nginx/conf.d/router.conf
 then
     ACTIVE_ENVIRONMENT="green-environment"
     NEW_ENVIRONMENT="blue-environment"
+else
+    ACTIVE_ENVIRONMENT="blue-environment"
+    NEW_ENVIRONMENT="green-environment"
 fi
 
 echo "Removing old \"$NEW_ENVIRONMENT\" container"
 docker-compose rm -f -s -v $NEW_ENVIRONMENT
+
+echo "Making code changes and commiting them"
+docker run -it -v "$(pwd)":/tmp/ ubuntu /tmp/update-code.sh
+update_result=$?
+if [ $update_result -eq 0 ]; then
+    echo "Code updated successfully"
+else
+    echo "Code update failed with exit code: $update_result"
+    echo "Exiting..."
+    exit 1
+fi
+
+git commit -am "Blue/Green update test"
+git add -A;
+git commit -m "generated files on `date +'%Y-%m-%d %H:%M:%S'`";
+git push
 
 echo "Starting new \"$NEW_ENVIRONMENT\" container"
 docker-compose up --build -d $NEW_ENVIRONMENT 
@@ -39,6 +58,15 @@ fi
 
 echo "Updating router settings to use \"$NEW_ENVIRONMENT\""
 eval 'docker-compose exec -T router sed -i "s|proxy_pass http://.*;|proxy_pass http://$NEW_ENVIRONMENT;|g" /etc/nginx/conf.d/router.conf'
+router_config=$?
+if [ $router_config -eq 0 ]; then
+    echo "Router config update succeded"
+else
+    echo "Router config update failed"
+    eval 'docker-compose exec -T router sed -i "s|proxy_pass http://.*;|proxy_pass http://$ACTIVE_ENVIRONMENT;|g" /etc/nginx/conf.d/router.conf'
+    echo "Rollback & Exiting..."
+    exit 1
+fi
 
 
 echo "Check router config"
@@ -76,6 +104,7 @@ if [ $service_status -eq 0 ]; then
 else
     echo "New deployment failed check"
     eval 'docker-compose exec -T router sed -i "s|proxy_pass http://.*;|proxy_pass http://$ACTIVE_ENVIRONMENT;|g" /etc/nginx/conf.d/router.conf'
+    docker-compose exec -T router nginx -g 'daemon off; master_process on;' -s reload
     echo "Rollback & Exiting..."
     exit 1
 fi
