@@ -1,11 +1,8 @@
 # Sprint-Name-Generator
-[Sprint Name Generator](https://sprintnamegenerator.com)
 
 Built by: 
 - [Florian Stadler](https://github.com/flostadler) - Go -> Wasm
 - [Wolfgang Ederer](https://github.com/wederer) - Frontend
-
-
 # Sprint-Name-Generator blue/green with docker-compose
 - [Ivan Jenkac](https://github.com/ijenkac)
 ## Usage
