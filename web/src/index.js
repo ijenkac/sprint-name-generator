@@ -13,6 +13,10 @@ const animationTiming = {
     LINEAR: 'linear',
 };
 
+const versionEl = document.getElementById('version');
+
+versionEl.textContent = `VERSION: "${VERSION}" COMMITHASH: "${COMMITHASH}" BRANCH: "${BRANCH}"`;
+
 document.addEventListener('DOMContentLoaded', function () {
     if (!WebAssembly.instantiateStreaming) { // polyfill
         WebAssembly.instantiateStreaming = async (resp, importObject) => {

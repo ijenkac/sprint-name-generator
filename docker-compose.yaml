@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  router:
+      build: ./router
+      image: sprint-name-generator-router:latest
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost/"]
+        interval: 5s
+        timeout: 3s
+        retries: 2      
+      ports:
+        - 80:80
+      networks:
+        frontend:
+        backend:        
+
+  green-environment:
+      build: ./
+      image: sprint-name-generator-app:latest
+      hostname: green-environment
+      networks:
+        backend:      
+      
+  blue-environment:
+      build: ./
+      image: sprint-name-generator-app:latest
+      hostname: blue-environment
+      networks:
+        backend:            
+
+networks:  
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge

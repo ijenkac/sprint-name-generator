@@ -5,6 +5,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack')
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
+const gitRevisionPlugin = new GitRevisionPlugin()
 
 module.exports = {
     optimization: {
@@ -48,6 +51,11 @@ module.exports = {
             template: 'index.template.html',
             hash: true,
         }),
+        new webpack.DefinePlugin({
+            'VERSION': JSON.stringify(gitRevisionPlugin.version()),
+            'COMMITHASH': JSON.stringify(gitRevisionPlugin.commithash()),
+            'BRANCH': JSON.stringify(gitRevisionPlugin.branch()),
+        }),        
         new CopyWebpackPlugin([
             { from: 'generator.wasm', to: 'generator.wasm' },
             { from: 'wasm_exec.js', to: 'wasm_exec.js' },
